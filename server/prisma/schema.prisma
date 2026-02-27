@@ -1,0 +1,191 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////
+// ENUMS
+/////////////////////////
+
+enum Role {
+  USER
+  IT
+  ADMIN
+}
+
+enum AssetStatus {
+  AVAILABLE
+  BORROWED
+  MAINTENANCE
+  RETIRED
+  ITOWNNER
+}
+
+enum AssetType {
+  ASSET
+  LICENSE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  BORROWED
+  RETURNED
+  OVERDUE
+}
+
+//////////////////////////
+// USER
+/////////////////////////
+
+model Department {
+  id        Int      @id @default(autoincrement())
+  prefix    Int
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sections Section[] // 1:N relation
+}
+
+model Section {
+  id           Int        @id @default(autoincrement())
+  prefix       Int?
+  name         String
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+  users        User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, departmentId]) // กันชื่อซ้ำใน department เดียวกัน
+}
+
+model User {
+  id        Int    @id @default(autoincrement())
+  empCode   String @unique
+  firstName String
+  lastName  String
+  email     String @unique
+
+  section   Section? @relation(fields: [sectionId], references: [id])
+  sectionId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////
+// CATEGORY
+/////////////////////////
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  assets    Asset[]
+}
+
+//////////////////////////
+// ASSET
+/////////////////////////
+
+model Asset {
+  id          Int         @id @default(autoincrement())
+  assetCode   String      @unique
+  name        String
+  description String?
+  status      AssetStatus @default(AVAILABLE)
+  type        AssetType   @default(ASSET)
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+
+  assetImages AssetImage[]
+  inventories Inventory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////
+// ASSET IMAGE
+/////////////////////////
+
+model AssetImage {
+  id       Int    @id @default(autoincrement())
+  assetId  Int
+  imageUrl String
+  asset    Asset  @relation(fields: [assetId], references: [id])
+
+  isPrimay Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////
+// INVENTORY (แยก Serial Number)
+/////////////////////////
+
+model Inventory {
+  id           Int      @id @default(autoincrement())
+  serialNumber String   @unique
+  location     String?
+  isAvailable  Boolean  @default(true)
+  asset        Asset    @relation(fields: [assetId], references: [id])
+  assetId      Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+//////////////////////////
+// License
+/////////////////////////
+
+model License {
+  id         Int       @id @default(autoincrement())
+  name       String
+  licenseKey String?
+  totalSeat  Int
+  usedSeat   Int       @default(0)
+  expireDate DateTime?
+
+  seats LicenseSeat[] // 1:N
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LicenseSeat {
+  id        Int     @id @default(autoincrement())
+  licenseId Int
+  seatKey   String?
+  isUsed    Boolean @default(false)
+  license   License @relation(fields: [licenseId], references: [id])
+}
+
+//////////////////////////
+// REQUEST
+/////////////////////////
+
+model Request {
+  id Int @id @default(autoincrement())
+  userId Int
+  assetId Int?
+  inventoryId Int?
+  licenseId Int?
+}
