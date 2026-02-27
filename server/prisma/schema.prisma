@@ -47,7 +47,7 @@ enum RequestStatus {
 
 model Department {
   id        Int      @id @default(autoincrement())
-  prefix    Int
+  prefix    String?
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -57,7 +57,7 @@ model Department {
 
 model Section {
   id           Int        @id @default(autoincrement())
-  prefix       Int?
+  prefix       String?
   name         String
   departmentId Int
   department   Department @relation(fields: [departmentId], references: [id])
