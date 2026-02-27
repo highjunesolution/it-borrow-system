@@ -29,12 +29,7 @@ enum AssetStatus {
   BORROWED
   MAINTENANCE
   RETIRED
-  ITOWNNER
-}
-
-enum AssetType {
-  ASSET
-  LICENSE
+  IT_OWNER
 }
 
 enum RequestStatus {
@@ -80,12 +75,16 @@ model User {
   firstName String
   lastName  String
   email     String @unique
+  role      Role   @default(USER)
 
-  section   Section? @relation(fields: [sectionId], references: [id])
+  section   Section @relation(fields: [sectionId], references: [id])
   sectionId Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  licenseSeats LicenseSeat[]
+  requests     Request[]
 }
 
 //////////////////////////
@@ -94,8 +93,9 @@ model User {
 
 model Category {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String   @unique
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   assets    Asset[]
 }
 
@@ -109,7 +109,6 @@ model Asset {
   name        String
   description String?
   status      AssetStatus @default(AVAILABLE)
-  type        AssetType   @default(ASSET)
 
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
@@ -129,53 +128,63 @@ model AssetImage {
   id       Int    @id @default(autoincrement())
   assetId  Int
   imageUrl String
-  asset    Asset  @relation(fields: [assetId], references: [id])
+  asset    Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
-  isPrimay Boolean @default(false)
+  isPrimary Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 //////////////////////////
-// INVENTORY (แยก Serial Number)
+// INVENTORY (เครื่องจริงแต่ละตัว)
 /////////////////////////
 
 model Inventory {
-  id           Int      @id @default(autoincrement())
-  serialNumber String   @unique
+  id           Int     @id @default(autoincrement())
+  serialNumber String  @unique
   location     String?
-  isAvailable  Boolean  @default(true)
-  asset        Asset    @relation(fields: [assetId], references: [id])
-  assetId      Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isAvailable  Boolean @default(true)
+
+  asset   Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  assetId Int
+
+  requests Request[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([assetId])
 }
 
 //////////////////////////
-// License
+// License (IT จัดการเอง)
 /////////////////////////
 
 model License {
   id         Int       @id @default(autoincrement())
   name       String
-  licenseKey String?
-  totalSeat  Int
-  usedSeat   Int       @default(0)
+  vendor     String?
   expireDate DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  seats LicenseSeat[] // 1:N
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  seats LicenseSeat[]
 }
 
 model LicenseSeat {
-  id        Int     @id @default(autoincrement())
-  licenseId Int
-  seatKey   String?
-  isUsed    Boolean @default(false)
-  license   License @relation(fields: [licenseId], references: [id])
+  id         Int       @id @default(autoincrement())
+  licenseId  Int
+  seatKey    String? // ถ้าแต่ละ seat มี key แยก
+  isUsed     Boolean   @default(false)
+  assignedAt DateTime?
+  userId     Int?
+
+  license License @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id])
+
+  @@unique([licenseId, seatKey])
+  @@index([userId])
 }
 
 //////////////////////////
@@ -183,9 +192,22 @@ model LicenseSeat {
 /////////////////////////
 
 model Request {
-  id Int @id @default(autoincrement())
-  userId Int
-  assetId Int?
-  inventoryId Int?
-  licenseId Int?
+  id          Int           @id @default(autoincrement())
+  userId      Int
+  inventoryId Int
+  status      RequestStatus @default(PENDING)
+
+  requestDate DateTime  @default(now())
+  approveDate DateTime?
+  dueDate     DateTime?
+  returnDate  DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([inventoryId])
+  @@index([status])
 }
