@@ -70,12 +70,14 @@ model Section {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
-  empCode   String @unique
+  id        Int     @id @default(autoincrement())
+  empCode   String  @unique
   firstName String
   lastName  String
-  email     String @unique
-  role      Role   @default(USER)
+  email     String  @unique
+  password  String
+  active    Boolean @default(true)
+  role      Role    @default(USER)
 
   section   Section @relation(fields: [sectionId], references: [id])
   sectionId Int

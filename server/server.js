@@ -15,15 +15,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
+// Step 3 Routex
 fs.readdirSync('./routes').map((item) => {
     app.use('/api', require('./routes/' + item))
 })
 
-
-// Step 3 Route
-const userRouter = require('./routes/users');
-app.use('/api', userRouter)
+// const userRouter = require('./routes/users');
+// app.use('/api', userRouter)
 
 
 // Step 2 start server
-app.listen(PORT, () => console.log(`Server is running`));
+app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
