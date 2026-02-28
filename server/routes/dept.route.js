@@ -1,5 +1,5 @@
 const express = require('express');
-const { create, list, update } = require('../controllers/dept.controller');
+const { create, list, update, del} = require('../controllers/dept.controller');
 const router = express.Router();
 
 
@@ -13,6 +13,6 @@ router.get('/department', list)
 router.put('/department/:id', update)
 
 // disable
-router.put('/department/del/:id', update)
+router.delete('/department/dis/:id', del)
 
 module.exports = router

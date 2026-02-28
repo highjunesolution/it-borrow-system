@@ -2,34 +2,61 @@ const prisma = require('../prisma/prisma')
 
 exports.create = async (req, res) => {
     try {
-        const {prefix, name} = req.body
-       const newDept =  await prisma.department.create({
+        const { prefix, name } = req.body
+        if (!name) {
+            return res.status(400).json({
+                ok: false,
+                msg: "name is required"
+            })
+        }
+
+        const duplicate = await prisma.department.findUnique({
+            where: {
+                name: name.toLowerCase()
+            }
+        })
+
+        if (duplicate) {
+            return res.status(400).json({
+                ok: false,
+                msg: "Department is aleary exits"
+            })
+        }
+
+        const newDept = await prisma.department.create({
             data: {
                 prefix,
                 name
             }
         })
 
-        if(!newDept) {
-            return res.status(500).json({
+        if (!newDept) {
+            return res.status(400).json({
                 ok: false,
-                msg: "Some thing went wrong, please try again!"
+                msg: "Something went wrong, please try again"
             })
         }
 
-        return res.statu(201).json({
+        return res.status(201).json({
             ok: true,
             msg: "New department is created",
             data: newDept
         })
     } catch (err) {
-        console.log(err);
+        res.status(500).json({
+            ok: false,
+            msg: `Server error : ${err.message}`
+        })
     }
 }
 
 exports.list = async (req, res) => {
-     try {
-        res.send("List Department")
+    try {
+        const department = await prisma.department.findMany()
+        return res.status(200).json({
+            ok: true,
+            department: department
+        })
     } catch (err) {
         console.log(err);
     }
@@ -37,18 +64,71 @@ exports.list = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        
+        const { prefix, name } = req.body
+        const { id } = req.params
+        const updateDept = await prisma.department.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                prefix,
+                name
+            }
+        })
+        if (!updateDept) {
+            return res.status(400).json({
+                ok: false,
+                msg: "Invalid information, please try again"
+            })
+        }
+
+        return res.status(200).json({
+            ok: true,
+            msg: "Department is updated",
+            department: updateDept
+        })
+
     } catch (err) {
-        console.log(err);
-        
+        res.status(500).json({
+            ok: false,
+            msg: `Server error : ${err.message}`
+        })
+
     }
 }
 
-exports.disable = async (req, res) => {
+exports.del = async (req, res) => {
     try {
-        
+        const { id } = req.params
+
+        const checkId = await prisma.department.findUnique({
+            where: {
+                id: Number(id)
+            }
+        })
+
+        if(!checkId) {
+            return res.status(400).json({
+                ok: false,
+                msg: "Department ID not found"
+            })
+        }
+
+        const del = await prisma.department.delete({
+            where: {
+                id: Number(id)
+            }
+        })
+
+        res.status(200).json({
+            ok: true,
+            msg: "Department is deleted",
+            department: del
+        })
     } catch (err) {
-        console.log(err);
-        
+        res.status(500).json({
+            ok: false,
+            msg: `Server error : ${err.message}`
+        })
     }
 }
