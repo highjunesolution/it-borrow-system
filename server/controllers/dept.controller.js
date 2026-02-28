@@ -52,13 +52,21 @@ exports.create = async (req, res) => {
 
 exports.list = async (req, res) => {
     try {
-        const department = await prisma.department.findMany()
+        const departments = await prisma.department.findMany({
+            orderBy: {
+                name: 'asc'
+            }
+        })
         return res.status(200).json({
             ok: true,
-            department: department
+            departments: departments 
         })
     } catch (err) {
         console.log(err);
+        res.status(500).json({
+            ok: false,
+            msg: `Server error : ${err.message}`
+        })
     }
 }
 
@@ -107,7 +115,7 @@ exports.del = async (req, res) => {
             }
         })
 
-        if(!checkId) {
+        if (!checkId) {
             return res.status(400).json({
                 ok: false,
                 msg: "Department ID not found"
