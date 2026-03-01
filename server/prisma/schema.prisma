@@ -71,7 +71,7 @@ model Section {
 
 model User {
   id        Int     @id @default(autoincrement())
-  empCode   String  @unique
+  empCode   String?  @unique
   firstName String
   lastName  String
   email     String  @unique
