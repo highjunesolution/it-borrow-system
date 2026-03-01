@@ -12,7 +12,7 @@ exports.create = async (req, res) => {
 
         const duplicate = await prisma.department.findFirst({
             where: {
-                name:{
+                name: {
                     contains: name,
                 }
             }
@@ -87,11 +87,19 @@ exports.list = async (req, res) => {
     try {
         const departments = await prisma.department.findMany({
             orderBy: {
-                name: 'asc'
+                id: 'asc'
+            },include: {
+                sections: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
             }
         })
         return res.status(200).json({
             ok: true,
+            count: departments.length,
             departments: departments
         })
     } catch (err) {
@@ -155,6 +163,17 @@ exports.del = async (req, res) => {
             })
         }
 
+        const sectionsCount = await prisma.section.count({
+            where: { departmentId: Number(id) }
+        })
+
+        if (sectionsCount > 0) {
+            return res.status(400).json({
+                ok: false,
+                msg: `Cannot delete department, it still has ${sectionsCount} section(s) attached to it`
+            })
+        }
+
         const del = await prisma.department.delete({
             where: {
                 id: Number(id)
@@ -164,7 +183,7 @@ exports.del = async (req, res) => {
         res.status(200).json({
             ok: true,
             msg: "Department is deleted",
-            department: del
+            removedDepartment: del
         })
     } catch (err) {
         res.status(500).json({

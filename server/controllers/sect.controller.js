@@ -73,6 +73,11 @@ exports.create = async (req, res) => {
                 prefix: prefix,
                 name: name,
                 departmentId: Number(departmentId)
+            },
+            include: {
+                department: {
+                    select: { id: true, name: true }
+                }
             }
         })
 
@@ -105,12 +110,13 @@ exports.list = async (req, res) => {
 
             },
             orderBy: {
-                name: 'asc'
+                id: 'asc'
             }
         });
 
         return res.status(200).json({
             ok: true,
+            count: sections.length,
             sections: sections
         })
     } catch (err) {
