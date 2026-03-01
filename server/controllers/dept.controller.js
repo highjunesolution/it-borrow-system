@@ -1,5 +1,5 @@
 const prisma = require('../prisma/prisma')
-
+const { sendEmail } = require('../services/email.service')
 exports.create = async (req, res) => {
     try {
         const { prefix, name } = req.body
@@ -10,9 +10,11 @@ exports.create = async (req, res) => {
             })
         }
 
-        const duplicate = await prisma.department.findUnique({
+        const duplicate = await prisma.department.findFirst({
             where: {
-                name: name.toLowerCase()
+                name:{
+                    contains: name,
+                }
             }
         })
 
@@ -37,6 +39,37 @@ exports.create = async (req, res) => {
             })
         }
 
+        // sendEmail(
+        //     "highjunesolution@outlook.com",
+        //     "New Department Created",
+        //     ` <div style="font-family: Arial; background:#f4f6f9; padding:20px;">
+        //          <div style="max-width:600px;margin:auto;background:#ffffff;padding:20px;border-radius:10px;">
+        //             <h2 style="color:#2c3e50;">New IT Request</h2>
+        //             <p><strong>Department ID:</strong> ${newDept.id}</p>
+        //             <p><strong>Department Name:</strong> ${newDept.name}</p>
+        //             <p><strong>Created :</strong> ${newDept.createdAt}</p>
+
+        //             <div style="margin-top:30px;text-align:center;">
+        //                 <a href="#"
+        //                 style="background:#27ae60;color:white;padding:12px 20px;
+        //                 text-decoration:none;border-radius:6px;margin-right:10px;">
+        //                 ✅ Approve
+        //                 </a>
+
+        //                 <a href="#"
+        //                 style="background:#e74c3c;color:white;padding:12px 20px;
+        //                 text-decoration:none;border-radius:6px;">
+        //                 ❌ Reject
+        //                 </a>
+        //             </div>
+
+        //             <p style="margin-top:40px;font-size:12px;color:#999;">
+        //                 IT Borrow System
+        //             </p>
+        //         </div>
+        //     </div>`
+        // )
+
         return res.status(201).json({
             ok: true,
             msg: "New department is created",
@@ -59,7 +92,7 @@ exports.list = async (req, res) => {
         })
         return res.status(200).json({
             ok: true,
-            departments: departments 
+            departments: departments
         })
     } catch (err) {
         console.log(err);
