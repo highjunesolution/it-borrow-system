@@ -20,6 +20,23 @@ const serverErr = (err, res) => {
     })
 }
 
+exports.list = async (req, res) => {
+    try {
+        const categories = await prisma.category.findMany({
+            include: {
+                assets: true
+            }
+        })
+
+        return res.status(200).json({
+            ok: true,
+            categories: categories
+        })
+    } catch (err) {
+        serverErr(err, res)
+    }
+}
+
 exports.create = async (req, res) => {
     try {
         const { name } = req.body
