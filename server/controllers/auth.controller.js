@@ -23,7 +23,7 @@ exports.login = async (req, res) => {
         // Step 1 find user from email
         const user = await prisma.user.findUnique({
             where: {
-                email: email
+                email: email,
             }
         })
 
@@ -74,6 +74,11 @@ exports.currentUser = async (req, res) => {
         const user = await prisma.user.findFirst({
             where: {
                 email: email
+            },select :{
+                id: true,
+                email: true,
+                empCode: true,
+                role: true,
             }
         })
         res.status(200).json({
