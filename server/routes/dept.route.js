@@ -5,15 +5,15 @@ const router = express.Router();
 
 
 // create
-router.post('/department', authMiddleware.auth, authMiddleware.adminAuth, create)
+router.post('/department', create)
 
 // get all
-router.get('/department', authMiddleware.auth, list)
+router.get('/departments', list)
 
 // update
-router.put('/department/:id', authMiddleware.auth, authMiddleware.adminAuth, update)
+router.put('/department/:id', update)
 
 // disable
-router.delete('/department/dis/:id', authMiddleware.auth, authMiddleware.adminAuth, del)
+router.delete('/department/dis/:id', del)
 
 module.exports = router

@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
 
 
         // Step 2 check user and compare password
-        const isMatch = user ?  await bcryptjs.compare(password, user.password) : false
+        const isMatch = user ? await bcryptjs.compare(password, user.password) : false
         if (!user || !isMatch) {
             return res.status(400).json({
                 ok: false,
@@ -38,7 +38,7 @@ exports.login = async (req, res) => {
         }
 
         // Step 3 user is active?
-        if(!user.active){
+        if (!user.active) {
             return res.status(403).json({
                 ok: false,
                 msg: "Account is disabled, please contact administrator"
@@ -67,3 +67,20 @@ exports.login = async (req, res) => {
         serverErr(err, res)
     }
 }
+
+exports.currentUser = async (req, res) => {
+    try {
+        const { email } = req.user
+        const user = await prisma.user.findFirst({
+            where: {
+                email: email
+            }
+        })
+        res.status(200).json({
+            user
+        })
+    } catch (err) {
+        serverErr(err, res)
+    }
+}
+
