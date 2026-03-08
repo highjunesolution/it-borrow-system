@@ -60,7 +60,7 @@ const AuthMenu = ({ collapse, setCollapse }) =>
 const Navbar = ({ collapse, setCollapse }) => {
   return (
     <>
-      <div className="max-w-350 px-4 xl:px-0 mx-auto h-16">
+      <div className="max-w-350 px-4 xl:px-2 lg:px-0 mx-auto h-16">
         <div className="flex justify-between items-center h-full">
           <div className="sm:hidden">
             <button
@@ -93,7 +93,7 @@ const Navbar = ({ collapse, setCollapse }) => {
       <div
         className={`bg-white fixed top-16 left-0 z-40 w-full duration-500 sm:-translate-y-100 ${collapse ? "translate-y-0" : "-translate-y-100"}`}
       >
-        <div className="max-w-350 px-4 py-3 xl:px-0 h-auto">
+        <div className="max-w-350 px-4 py-3 xl:px-2 lg:px-0 h-auto">
           <div className="flex flex-col gap-y-2">
             <NavMenu />
             <div className="flex flex-col gap-y-2 border-t border-gray-200 pt-4">

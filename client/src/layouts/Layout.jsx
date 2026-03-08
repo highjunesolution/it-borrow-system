@@ -11,7 +11,7 @@ const Layout = () => {
           <Navbar collapse={collapse} setCollapse={setCollapse} />
         </div>
         <div className="flex-1">
-          <div className="max-w-350 px-4 xl:px-0 mx-auto">
+          <div className="max-w-350 px-4 xl:px-2 lg:px-0 mx-auto">
             <Outlet />
           </div>
         </div>

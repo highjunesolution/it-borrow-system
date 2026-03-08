@@ -8,7 +8,6 @@ import { register } from "../../apis/users";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-  // const actionRegister = useMisStore((state) => state.actionRegister);
   const [departments, setDepartment] = useState([]);
   const [selectDept, setSelectDept] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -143,16 +142,31 @@ const Register = () => {
     }
   };
   return (
-    <div className="grid grid-cols-12 gap-3">
-      <div className="col-span-12 sm:col-span-12 bg-white shadow-lg py-6 px-6 rounded-xl">
+    <div className="grid grid-cols-12 gap-3 max-w-5xl mx-auto">
+      {/* <div className="hidden sm:block duration-500 col-span-4 bg-linear-to-b from-gray-800 via-gray-500 to-gray-400  rounded-xl shadow-xl">
+        <div className="py-16 px-4 space-y-10 my-auto">
+          <h1 className="text-2xl font-extrabold text-white/90 text-center">
+            Welcome to IT City land of IT Smile and fuck shit user
+          </h1>
+          <p className="text-md font-light text-white">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste facere
+            nisi quas. Voluptatum doloribus, ducimus reiciendis voluptate, iure
+            veritatis non repudiandae nobis debitis ullam perferendis harum, quo
+            esse illum deserunt fuga cum officiis labore sequi qui! Cumque
+            doloribus veritatis vitae sequi fuga dolores temporibus quo nam quam
+            quidem. Libero, rem.
+          </p>
+        </div>
+      </div> */}
+      <div className="col-span-12 bg-white shadow-lg p-8 rounded-xl">
         <div className="flex flex-col gap-y-4">
           <div className="space-y-4">
-            <p className="text-2xl font-medium">Register Form</p>
+            <p className="text-3xl font-extrabold">Register Form</p>
             <div className="border-b border-2 border-sky-400 w-16"></div>
           </div>
           <div>
             <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-12 gap-4">
+              <div className="grid grid-cols-12 gap-y-6 gap-x-4">
                 <div className="col-span-12 grid gap-2 items-center">
                   <label
                     htmlFor="email"
@@ -317,9 +331,6 @@ const Register = () => {
             </form>
           </div>
         </div>
-      </div>
-      <div className="hidden sm:block duration-500 col-span-3 bg-white py-6 px-4 rounded-md">
-        right
       </div>
     </div>
   );
