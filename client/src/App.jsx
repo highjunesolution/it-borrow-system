@@ -2,12 +2,14 @@ import React from "react";
 import AppRoutes from "./routes/AppRoutes";
 import { GooeyToaster } from "goey-toast";
 import 'goey-toast/styles.css'
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
     <>
-      <GooeyToaster position="bottom-center" />
       <AppRoutes />
+      <GooeyToaster position="bottom-center" />
+      <ToastContainer position="bottom-right" limit={4}/>
     </>
   );
 };

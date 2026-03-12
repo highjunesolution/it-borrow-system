@@ -3,12 +3,16 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { listDepartments } from "../apis/departments";
 import { client } from "../apis/api";
 import { login } from "../apis/auth";
+import { addCategory, getListCategories } from "../apis/categories";
 const misStore = (set) => ({
   user: null,
   token: null,
   departments: [],
+  categories: [],
+  headerName: "",
+  setHeaderName: (name) => set({ headerName: name }),
   logout: () => {
-    localStorage.removeItem("mis-store")
+    localStorage.removeItem("mis-store");
     set({
       user: null,
       token: null,
@@ -26,8 +30,8 @@ const misStore = (set) => ({
   actionLogin: async (form) => {
     const res = await login(form);
     set({
-      user: res.data.user,
-      token: res.data.token,
+      user: res.data?.user || null,
+      token: res.data?.token || null,
     });
     return res;
   },
@@ -36,11 +40,22 @@ const misStore = (set) => ({
       const res = await listDepartments();
       console.log(res.data.departments);
       set({
-        departments: res.data.departments,
+        departments: res.data.departments || [],
       });
     } catch (err) {
       console.log(err);
     }
+  },
+  createCategory: async (token, form) => {
+    const res = await addCategory(token, form);
+    return res;
+  },
+  getCategories: async (token) => {
+    const res = await getListCategories(token);
+    set({
+      categories: res.data.categories || [],
+    });
+    return res;
   },
 });
 const usePersist = {
