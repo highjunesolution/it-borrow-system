@@ -73,13 +73,21 @@ exports.getAsset = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        const { assetCode, name, description, categoryId } = req.body
+        const { assetCode, name, description, categoryId, status } = req.body
+        const inventories = JSON.parse(req.body.inventories || "[]");
         const files = req.files
 
         if (!assetCode || !name || !categoryId) {
             return res.staus(400).json({
                 ok: false,
                 msg: "Something filed is required"
+            })
+        }
+
+        if (inventories.length < 0) {
+            return res.status(400).json({
+                ok: false,
+                msg: "A minimum of 1 item must be in stock"
             })
         }
 
@@ -105,10 +113,18 @@ exports.create = async (req, res) => {
                 name: name,
                 description: description,
                 categoryId: Number(categoryId),
+                status: status,
                 assetImages: {
                     create: files.map((file, index) => ({
                         imageUrl: file.filename,
                         isPrimary: index === 0
+                    }))
+                },
+                inventories: {
+                    create: inventories.map((item) => ({
+                        serialNumber: item.serialNumber,
+                        location: item.location,
+                        isAvailable: item.isAvailable
                     }))
                 }
             },
@@ -186,14 +202,14 @@ exports.update = async (req, res) => {
                 ...(categoryId && { categoryId: Number(categoryId) }),
                 ...(files?.length > 0 && {
                     assetImages: {
-                        create: files.map((file, index)=>({
+                        create: files.map((file, index) => ({
                             imageUrl: file.filename,
                             isPrimary: index === 0,
                         }))
                     }
                 })
             },
-             include: {
+            include: {
                 category: true,
                 assetImages: true,
                 inventories: true,

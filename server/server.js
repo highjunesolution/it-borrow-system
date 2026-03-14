@@ -8,12 +8,14 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const fs = require('fs')
+const path = require('path')
 
 // Step 4 Use middlewares
 app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
+app.use('/api/uploads/assets', express.static(path.join(__dirname, 'uploads/assets')));
 
 // Step 3 Routex
 fs.readdirSync('./routes').map((item) => {
